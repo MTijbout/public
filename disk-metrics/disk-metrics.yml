@@ -1,0 +1,28 @@
+package:
+    name: MT-disk-metric-service        
+    description: Install a service to collect disk metrics.
+    version: 1.0.3
+    manifest:
+        headlessExecution: true
+        lifecycle:
+            -   phase: verify
+                action: verify.sh
+            -   phase: execute
+                action: execute.sh
+            -   phase: validate
+                action: validate.sh
+            -   phase: activate
+                action: activate.sh
+            -   phase: reset
+                action: reset.sh
+
+    attachments:
+        -   path: /home/pulsecampaigns/disk-metrics/files/diskUtilization.py
+        -   path: /home/pulsecampaigns/disk-metrics/files/diskUtilization.sh
+        -   path: /home/pulsecampaigns/disk-metrics/files/gateway-metrics.service
+        -   path: /home/pulsecampaigns/disk-metrics/files/verify.sh
+        -   path: /home/pulsecampaigns/disk-metrics/files/execute.sh
+        -   path: /home/pulsecampaigns/disk-metrics/files/validate.sh
+        -   path: /home/pulsecampaigns/disk-metrics/files/activate.sh
+        -   path: /home/pulsecampaigns/disk-metrics/files/reset.sh
+

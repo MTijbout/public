@@ -1,0 +1,8 @@
+This is the script: verify
+This is the script: execute
+Directory /opt/scripts does not exists.
+Directory /opt/scripts created.
+Rights on directory /opt/scripts set.
+Could not copy files to directory /opt/scripts 
+Could not copy service file to directory /etc/systemd/system
+Service gateway-metrics failed to start

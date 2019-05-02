@@ -1,0 +1,15 @@
+[Unit]
+Description=GatewayMetricsService
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/scripts
+ExecStart=/opt/scripts/diskUtilization.sh
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
