@@ -20,10 +20,39 @@ SCRIPT_NAME=`basename "$0"`
 ## Log file definition
 LOGFILE=$WORKDIR/$SCRIPT_NAME-`date +%Y-%m-%d_%Hh%Mm`.log
 
+## Color settings
+## High Intensity
+IGreen='\e[0;92m'       # Green
+IYellow='\e[0;93m'      # Yellow
+IBlue='\e[0;94m'        # Blue
+ICyan='\e[0;96m'        # Cyan
+IWhite='\e[0;97m'       # White
+
+## Bold High Intensity
+BIRed='\e[1;91m'        # Red
+BIGreen='\e[1;92m'      # Green
+BIYellow='\e[1;93m'     # Yellow
+BIPurple='\e[1;95m'     # Purple
+BIMagenta='\e[1;95m'    # Purple
+BICyan='\e[1;96m'       # Cyan
+BIWhite='\e[1;97m'      # White
+
 ## Logging and ECHO functionality combined.
 printl() {
     printf "\n%s" "$1"
     echo -e "$1" >> $LOGFILE
+}
+
+printstatus() {
+    h=$(($SECONDS/3600));
+    m=$((($SECONDS/60)%60));
+    s=$(($SECONDS%60));
+    printf "\r\n${BIGreen}==\r\n== ${BIYellow}$1"
+    printf "\r\n${BIGreen}== ${IBlue}Total: %02dh:%02dm:%02ds Cores: $ACTIVECORES \r\n${BIGreen}==${IWhite}\r\n\r\n"  $h $m $s;
+    printl ""
+    printl "############################################################"
+    printl "$1"
+    printl ""
 }
 
 ## Determine CPU Architecture:
@@ -217,7 +246,7 @@ doPulseAgentUninstall() {
 
 ## Module Logic
 modulePulseAgent() {
-    echo "Installation of the Pulse Agent..."
+    printstatus "Installation of the Pulse Agent..."
 
     ## Module variables
     PLSAGTINSTALLED="false"
