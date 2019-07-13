@@ -263,10 +263,10 @@ printl "  - Pulse Agent: Nothing more to do. Exiting this part."
 printl ""
 
 }
-if [[ $MYMENU == *"PULSE_AGENT"* ]]; then
-    PULSEINSTANCE="iotc005"
-    modulePulseAgent
-fi
+
+PULSEINSTANCE="iotc005"
+modulePulseAgent
+
 
 
 #########################
