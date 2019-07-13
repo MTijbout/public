@@ -233,30 +233,9 @@ modulePulseAgent() {
     getPulseAgentLatestVersionInfo
     pulseAgentAlreadyInstalled
     if [[ $PLSAGTINSTALLED == "true" ]]; then
-        # printl "Pulse Agent is installed."
-        # Check now if it is the latest version.
-        # compareLatestPulseAgentVersion
-        # if [[ $PLSAGTLATEST == "true" ]]; then
-        #     # Pulse Agent is the latest verstion."
-        #     # Check now if user want's to reinstall
-        #     pulseAgentResinstall
-        #     if [[ $PLSAGTREINSTALL == "true" ]]; then
-        #         # User wants to reinstall the Pulse Agent
-        #         doPulseAgentUninstall
-        #         doPulseAgentDownload
-        #         doPulseAgentInstall
-        #     else
-        #         # User does not want to reinstall the Pulse Agent.
-        #         # Exit the function.
-        #         printl "    - Pulse Agent: Nothing more to do. Exiting installation loop."
-        #         return
-        #     fi
-        # else
-            # Pulse agent is installed, but not the latest version.
-            doPulseAgentUninstall
-            doPulseAgentDownload
-            doPulseAgentInstall
-        fi
+        doPulseAgentUninstall
+        doPulseAgentDownload
+        doPulseAgentInstall
     else
         # printl "Pulse Agent is not installed."
         # Let's go install the agent.
