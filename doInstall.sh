@@ -26,6 +26,8 @@ printl() {
     echo -e "$1" >> $LOGFILE
 }
 
+## Determine CPU Architecture:
+CPUARCH=$(lscpu | grep Architecture | tr -d ":" | awk '{print $2}')
 
 ################################################################################
 # Install the VMware Pulse Agent.
@@ -215,7 +217,7 @@ doPulseAgentUninstall() {
 
 ## Module Logic
 modulePulseAgent() {
-    printstatus "Installation of the Pulse Agent..."
+    echo "Installation of the Pulse Agent..."
 
     ## Module variables
     PLSAGTINSTALLED="false"
@@ -242,25 +244,25 @@ modulePulseAgent() {
         doPulseAgentInstall
     fi
 
-## Cleanup variables
-PLSAGTDLFLD=""
-PLSAGTVERSION=""
-PULSEINSTANCE=""
-PULSEADDENDUM=""
-PULSEHOST=""
-PULSEPORT=""
-TIMEOUT=""
-PULSEAGENTX86=""
-PULSEAGENTARM=""
-PULSEAGENTARM64=""
-PULSEURLX86=""
-PULSEURLARM=""
-PULSEURLARM64=""
-PLSAGTREINSTALL=""
-PLSAGTINSTALLED=""
+    ## Cleanup variables
+    PLSAGTDLFLD=""
+    PLSAGTVERSION=""
+    PULSEINSTANCE=""
+    PULSEADDENDUM=""
+    PULSEHOST=""
+    PULSEPORT=""
+    TIMEOUT=""
+    PULSEAGENTX86=""
+    PULSEAGENTARM=""
+    PULSEAGENTARM64=""
+    PULSEURLX86=""
+    PULSEURLARM=""
+    PULSEURLARM64=""
+    PLSAGTREINSTALL=""
+    PLSAGTINSTALLED=""
 
-printl "  - Pulse Agent: Nothing more to do. Exiting this part."
-printl ""
+    printl "  - Pulse Agent: Nothing more to do. Exiting this part."
+    printl ""
 
 }
 
