@@ -295,7 +295,7 @@ modulePulseAgent() {
 
 }
 
-PULSEINSTANCE="iotc005"
+PULSEINSTANCE="iotc008"
 modulePulseAgent
 
 
