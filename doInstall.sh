@@ -298,7 +298,7 @@ modulePulseAgent() {
 PULSEINSTANCE="iotc008"
 modulePulseAgent
 
-
+shutdown -r now
 
 #########################
 # Onboadring comes next #
