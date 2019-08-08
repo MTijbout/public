@@ -10,7 +10,7 @@ WORKDIR=/$PWD
 SCRIPT_NAME="VMwarePulseAgentInstall"
 
 ## Log file definition
-LOGFILE=$WORKDIR/$SCRIPT_NAME-`date +%Y-%m-%d_%Hh%Mm`.log
+LOGFILE=/var/log/$SCRIPT_NAME-`date +%Y-%m-%d_%Hh%Mm`.log
 
 ## Logging and ECHO functionality combined.
 printl() {
