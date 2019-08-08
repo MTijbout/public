@@ -8,6 +8,7 @@
 SCRIPT_VERSION="0.7"
 WORKDIR=/$PWD
 SCRIPT_NAME="VMwarePulseAgentInstall"
+source "$PWD/COL_TABLE"
 
 ## Log file definition
 LOGFILE=/var/log/$SCRIPT_NAME-`date +%Y-%m-%d_%Hh%Mm`.log
@@ -253,6 +254,8 @@ modulePulseAgent() {
     PLSAGTINSTALLED=""
 
     printl "  ${TICK} Pulse Agent Installation: Nothing more to do. Exiting this part.\n"
+    printl "\n  ${INFO} Installation log file can be found in /var/log/VMwarePulseAgentInstall-date_time ... \n"
+
 
 }
 
