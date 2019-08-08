@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ################################################################################
 #                            - INITIAL ROUTINES -                              #
@@ -20,7 +20,6 @@ printl() {
 }
 
 printl "  ${INFO} Installation of VMware Pulse Agent."
-printl "  ${INFO} Connection initiated from: $SSH_CLIENT"
 printl "  ${INFO} Script version: $SCRIPT_VERSION"
 
 ## Determine CPU Architecture:
@@ -42,23 +41,23 @@ pulseAgentAlreadyInstalled() {
         PLSAGTINSTALLED="false"
     else
         printl "  ${TICK} Pulse Agent: Is installed."
-        PLSAGTINSTALLED="true" 
+        PLSAGTINSTALLED="true"
     fi
 }
 
-pulseAgentResinstall() {
-    printl "  ${INFO} - Pulse Agent: Check to reinstall the Pulse Agent."
-    if (whiptail --title "Pulse Agent Installed" --yesno "Pulse agent is already installed. Reinstall?\nOK?" 8 78); then
-        ## Reinstall the agent.
-        printl "  ${INFO} - Pulse Agent: Selection to reinstall the agent."
-        PLSAGTREINSTALL="true"
-    else
-        ## User does not want to reinstall the agent when it is already installed.
-        printl "  ${ESCL} - Pulse Agent: Selection NOT to reinstall the agent."
-        PLSAGTREINSTALL="false"
-        return
-    fi
-}
+# pulseAgentResinstall() {
+#     printl "  ${INFO} - Pulse Agent: Check to reinstall the Pulse Agent."
+#     if (whiptail --title "Pulse Agent Installed" --yesno "Pulse agent is already installed. Reinstall?\nOK?" 8 78); then
+#         ## Reinstall the agent.
+#         printl "  ${INFO} - Pulse Agent: Selection to reinstall the agent."
+#         PLSAGTREINSTALL="true"
+#     else
+#         ## User does not want to reinstall the agent when it is already installed.
+#         printl "  ${ESCL} - Pulse Agent: Selection NOT to reinstall the agent."
+#         PLSAGTREINSTALL="false"
+#         return
+#     fi
+# }
 
 ## Auto - Instance Hardcoded
 getPulseInstanceDetails() {
@@ -97,7 +96,7 @@ testPulseInstanceConnectivity(){
 ## Auto - Get latest version for download.
 getPulseAgentLatestVersionInfo() {
     ## Determine agent version to be downloaded.
-    printl "  ${INFO} Pulse Agent: Get information on latest Pulse Agent available."
+    printl "  ${INFO} Pulse Agent: Get information on latest Pulse Agent available.\n"
     PULSE_MANIFEST="https://$PULSEINSTANCE.vmware.com/api/iotc-agent/manifest.json"
     printl "  ${INFO} - Manifest file: $PULSE_MANIFEST"
     printl "  ${INFO} - Download folder: $PLSAGTDLFLD"
@@ -136,7 +135,7 @@ getPulseAgentLatestVersionInfo() {
 
 subDownloadPulseAgent() {
     ## Downloading the agent.
-    printl "  ${INFO} Pulse Agent: Downloading the Pulse Agent.\N"
+    printl "  ${INFO} Pulse Agent: Downloading the Pulse Agent.\n"
     curl -o $PLSAGTDLFLD/$1 $2 2>&1 | tee -a $LOGFILE
     if [ $? -eq 0 ]; then
         printl "  ${TICK} - Pulse Agent: Download successful."
@@ -151,7 +150,7 @@ subDownloadPulseAgent() {
 
 ## Auto - Download
 doPulseAgentDownload() {
-    printl "  ${INFO} - Pulse Agent: Initiating download."
+    printl "  ${INFO} - Pulse Agent: Initiating download.\n\n"
     PULSEAGENTX86="iotc-agent-x86_64-$PLSAGTVERSION.tar.gz"
     PULSEAGENTARM="iotc-agent-arm-$PLSAGTVERSION.tar.gz"
     PULSEAGENTARM64="iotc-agent-aarch64-$PLSAGTVERSION.tar.gz"
@@ -160,11 +159,11 @@ doPulseAgentDownload() {
     PULSEURLARM64="https://$PULSEHOST/api/iotc-agent/$PULSEAGENTARM64"
 
     if [[ $CPUARCH == *"x86_64"* ]];then
-        subDownloadPulseAgent "$PULSEAGENTX86" "$PULSEURLX86" "$CPUARCH"  
+        subDownloadPulseAgent "$PULSEAGENTX86" "$PULSEURLX86" "$CPUARCH"
         elif [[ $CPUARCH == *"armv7l"* ]];then
-            subDownloadPulseAgent "$PULSEAGENTARM" "$PULSEURLARM" "$CPUARCH"      
+            subDownloadPulseAgent "$PULSEAGENTARM" "$PULSEURLARM" "$CPUARCH"
         elif [[ $CPUARCH == *"ARMv8"* ]];then
-            subDownloadPulseAgent "$PULSEAGENTARM64" "$PULSEURLARM64" "$CPUARCH" 
+            subDownloadPulseAgent "$PULSEAGENTARM64" "$PULSEURLARM64" "$CPUARCH"
         elif [[ $CPUARCH == *"i686"* ]];then
             printl "  ${CROSS} - By the look of it, $CPUARCH is not one of the supported CPU Architectures - aborting${BIWhite}\r\n"; exit
         else
@@ -179,11 +178,11 @@ doPulseAgentDownload() {
 ## Auto - Install
 doPulseAgentInstall() {
     ## Installing the agent
-    printl "  ${INFO} Pulse Agent: Install the Agent.\n\n"
+    printl "  ${INFO} Pulse Agent: Install the Agent.\n"
     $PLSAGTDLFLD/iotc-agent/install.sh 2>&1 | tee -a $LOGFILE
     if [ $? -eq 0 ]; then
         printl "  ${TICK} - Pulse Agent: Installed in /opt/vmware/iotc-agent"
-    else 
+    else
         printl "  ${CROSS} - Pulse Agent: Installation NOT succesful."
     fi
 }
@@ -191,7 +190,7 @@ doPulseAgentInstall() {
 ## Auto - If installed, uninstall
 doPulseAgentUninstall() {
     ## Uninstall the Pulse Agent
-    printl "  ${ESCL} Pulse Agent: Uninstall the agent.\n\n"
+    printl "  ${ESCL} Pulse Agent: Uninstall the agent.\n"
     /opt/vmware/iotc-agent/uninstall.sh 2>&1 | tee -a $LOGFILE
     if [ $? -eq 0 ]; then
         printl "  ${TICK} - Pulse Agent: Successfully uninstalled the agent."
