@@ -5,37 +5,12 @@
 ################################################################################
 
 ## Version of theScript.sh
-SCRIPT_VERSION="0.1a"
-
-## The user that executed the script.
-USERID=$(logname)
-# if [ "$EUID" == 0 ]; then 
-#     WORKDIR=/$USERID
-# else
-#     WORKDIR=/home/$USERID
-# fi
+SCRIPT_VERSION="0.7"
 WORKDIR=/$PWD
+SCRIPT_NAME="VMwarePulseAgentInstall"
 
-SCRIPT_NAME=`basename "$0"`
 ## Log file definition
 LOGFILE=$WORKDIR/$SCRIPT_NAME-`date +%Y-%m-%d_%Hh%Mm`.log
-
-## Color settings
-## High Intensity
-IGreen='\e[0;92m'       # Green
-IYellow='\e[0;93m'      # Yellow
-IBlue='\e[0;94m'        # Blue
-ICyan='\e[0;96m'        # Cyan
-IWhite='\e[0;97m'       # White
-
-## Bold High Intensity
-BIRed='\e[1;91m'        # Red
-BIGreen='\e[1;92m'      # Green
-BIYellow='\e[1;93m'     # Yellow
-BIPurple='\e[1;95m'     # Purple
-BIMagenta='\e[1;95m'    # Purple
-BICyan='\e[1;96m'       # Cyan
-BIWhite='\e[1;97m'      # White
 
 ## Logging and ECHO functionality combined.
 printl() {
@@ -43,20 +18,13 @@ printl() {
     echo -e "$1" >> $LOGFILE
 }
 
-printstatus() {
-    h=$(($SECONDS/3600));
-    m=$((($SECONDS/60)%60));
-    s=$(($SECONDS%60));
-    printf "\r\n${BIGreen}==\r\n== ${BIYellow}$1"
-    printf "\r\n${BIGreen}== ${IBlue}Total: %02dh:%02dm:%02ds Cores: $ACTIVECORES \r\n${BIGreen}==${IWhite}\r\n\r\n"  $h $m $s;
-    printl ""
-    printl "############################################################"
-    printl "$1"
-    printl ""
-}
+printl "  ${INFO} Installation of VMware Pulse Agent."
+printl "  ${INFO} Connection initiated from: $SSH_CLIENT"
+printl "  ${INFO} Script version: $SCRIPT_VERSION"
 
 ## Determine CPU Architecture:
 CPUARCH=$(lscpu | grep Architecture | tr -d ":" | awk '{print $2}')
+printl "  ${INFO} CPU Architecture detected: $CPUARCH"
 
 ################################################################################
 # Install the VMware Pulse Agent.
@@ -66,13 +34,13 @@ CPUARCH=$(lscpu | grep Architecture | tr -d ":" | awk '{print $2}')
 
 ## Auto - Is installed or not.
 pulseAgentAlreadyInstalled() {
-    printl "  - Pulse Agent: Check if already installed."
+    printl "  ${INFO} Pulse Agent: Check if already installed."
     ## Check if the pulse agent is already installed.
     if [ ! -f /opt/vmware/iotc-agent/version ]; then
-        printl "    - Pulse Agent: Not installed."
+        printl "  ${CROSS} Pulse Agent: Not installed."
         PLSAGTINSTALLED="false"
     else
-        printl "    - Pulse Agent: Is installed."
+        printl "  ${TICK} Pulse Agent: Is installed."
         PLSAGTINSTALLED="true" 
     fi
 }
@@ -108,19 +76,19 @@ getPulseInstanceDetails() {
 ## Auto - Check Connection
 testPulseInstanceConnectivity(){
     ## TEST CONNECTION TO YOUR PULSE INSTANCE"
-    printl "  - Pulse Agent: Test connection to Pulse Instance: $PULSEHOST"
+    printl "  ${INFO} Pulse Agent: Test connection to Pulse Instance: $PULSEHOST"
     if [[ $OPSYS == *"CENTOS"* ]]; then
         ## Install nc if not present.
         [ ! -x /bin/nc ] && $PCKMGR $AQUIET -y update > /dev/null 2>&1 && $PCKMGR $AQUIET -y install nc 2>&1 | tee -a $LOGFILE
     fi
 
     if nc -w $TIMEOUT -z $PULSEHOST $PULSEPORT; then
-        printl "    - Connection to the Pulse Server ${PULSEHOST} was Successful"
+        printl "  ${TICK} Connection to the Pulse Server ${PULSEHOST} was Successful"
     else
-        printl "    CONNECTION FAILED!"
-        printl "    Connection to the Pulse Server ${PULSEHOST} Failed"
-        printl "    Please Confirm if the Pulse URL is correct"
-        printl "    If the Pulse URL is correct, then please ensure that we can open an outbound HTTPS connection to the Pulse Server over port 443"
+        printl "  ${CROSS} CONNECTION FAILED!"
+        printl "  ${ESCL} - Connection to the Pulse Server ${PULSEHOST} Failed"
+        printl "  ${ESCL} - Please Confirm if the Pulse URL is correct"
+        printl "  ${ESCL} - If the Pulse URL is correct, then please ensure that we can open an outbound HTTPS connection to the Pulse Server over port 443"
         return
     fi
 }
@@ -128,68 +96,61 @@ testPulseInstanceConnectivity(){
 ## Auto - Get latest version for download.
 getPulseAgentLatestVersionInfo() {
     ## Determine agent version to be downloaded.
-    printl "  - Pulse Agent: Get information on latest Pulse Agent available."
+    printl "  ${INFO} Pulse Agent: Get information on latest Pulse Agent available."
     PULSE_MANIFEST="https://$PULSEINSTANCE.vmware.com/api/iotc-agent/manifest.json"
-    printl "    - Manifest file: $PULSE_MANIFEST"
-    printl "    - Download folder: $PLSAGTDLFLD"
-    printl "    - Manifest file: $PLSAGTDLFLD/manifest.json"
+    printl "  ${INFO} - Manifest file: $PULSE_MANIFEST"
+    printl "  ${INFO} - Download folder: $PLSAGTDLFLD"
+    printl "  ${INFO} - Manifest file: $PLSAGTDLFLD/manifest.json"
     printl ""
     printl ""
     curl -o $PLSAGTDLFLD/manifest.json $PULSE_MANIFEST 2>&1 | tee -a $LOGFILE
     if [ $? -eq 0 ]; then
-        printl "    - Pulse Agent: Manifest download successful."  
-    else 
-        printl "    - Pulse Agent: Manifest download NOT successful."
+        printl "  ${TICK} - Pulse Agent: Manifest download successful."
+    else
+        printl "  ${CROSS} - Pulse Agent: Manifest download NOT successful."
     fi
     PLSAGTVERSION=$(awk -F'"' '{print $8}' $PLSAGTDLFLD/manifest.json)
-    printl "    - Pulse Agent: Available for download: $PLSAGTVERSION "
+    printl "  ${INFO} - Pulse Agent: Available for download: $PLSAGTVERSION "
 }
 
-compareLatestPulseAgentVersion() {
-    printl "  - Pulse Agent: Compare the versions."
-    PLSAGTINSTALLVER=$(cat /opt/vmware/iotc-agent/version)
-    printl "    - Installed version: $PLSAGTINSTALLVER"
-    if [ -z "$PLSAGTINSTALLVER" ]; then
-        ## There is no value in variable.
-        printl "  ERROR: Empty variable. Cannot proceed."
-        return
-    else
-        printl "    - Available version: $PLSAGTVERSION"
-        if [[ "$PLSAGTINSTALLVER" == "$PLSAGTVERSION" ]]; then
-            PLSAGTLATEST="true"
-            printl "    - Latest version is installed."
-        else
-            PLSAGTLATEST="false"
-            printl "    - Older version installed: $PLSAGTINSTALLVER"
-        fi
-    fi
-}
-
-checkPulseAgentDownload() {
-    printl "Future: Check if Pulse Agent is already downloaded"
-    ## Check if the agent is already downloaded. CHECKSUM?
-    #@@@ Make sure we do not download unnecessary.
-}
+# compareLatestPulseAgentVersion() {
+#     printl "  ${INFO} Pulse Agent: Compare the versions."
+#     PLSAGTINSTALLVER=$(cat /opt/vmware/iotc-agent/version)
+#     printl "  ${INFO} - Installed version: $PLSAGTINSTALLVER"
+#     if [ -z "$PLSAGTINSTALLVER" ]; then
+#         ## There is no value in variable.
+#         printl "  ${CROSS} ERROR: Empty variable. Cannot proceed."
+#         return
+#     else
+#         printl "  ${INFO} - Available version: $PLSAGTVERSION"
+#         if [[ "$PLSAGTINSTALLVER" == "$PLSAGTVERSION" ]]; then
+#             PLSAGTLATEST="true"
+#             printl "  ${TICK} - Latest version is installed."
+#         else
+#             PLSAGTLATEST="false"
+#             printl "  ${ESCL} - Older version installed: $PLSAGTINSTALLVER"
+#         fi
+#     fi
+# }
 
 subDownloadPulseAgent() {
     ## Downloading the agent.
-    printl ""
-    printl ""
+    printl "  ${INFO}  Pulse Agent: Downloading the Pulse Agent.\N"
     curl -o $PLSAGTDLFLD/$1 $2 2>&1 | tee -a $LOGFILE
     if [ $? -eq 0 ]; then
-        printl "  - Pulse Agent: Download successful."
+        printl "  ${TICK} - Pulse Agent: Download successful."
         ## Unpacking the agent.
-        printl "  - Unpack $PLSAGTDLFLD/$1"
+        printl "  ${INFO} - Unpack $PLSAGTDLFLD/$1"
         tar -xzf $PLSAGTDLFLD/$1 -C $PLSAGTDLFLD/
-        printl "  - Pulse Agent for $3 is unpacked."  
+        printl "  ${INFO} - Pulse Agent for $3 is unpacked."  
     else 
-        printl "  - Pulse Agent: Download NOT successful."
+        printl "  ${CROSS} - Pulse Agent: Download NOT successful."
     fi
 }
 
 ## Auto - Download
 doPulseAgentDownload() {
-    printl "  - Pulse Agent: Initiating download."
+    printl "  ${INFO} - Pulse Agent: Initiating download."
     PULSEAGENTX86="iotc-agent-x86_64-$PLSAGTVERSION.tar.gz"
     PULSEAGENTARM="iotc-agent-arm-$PLSAGTVERSION.tar.gz"
     PULSEAGENTARM64="iotc-agent-aarch64-$PLSAGTVERSION.tar.gz"
@@ -204,9 +165,9 @@ doPulseAgentDownload() {
         elif [[ $CPUARCH == *"ARMv8"* ]];then
             subDownloadPulseAgent "$PULSEAGENTARM64" "$PULSEURLARM64" "$CPUARCH" 
         elif [[ $CPUARCH == *"i686"* ]];then
-            printl "${BIRed}By the look of it, $CPUARCH is not one of the supported CPU Architectures - aborting${BIWhite}\r\n"; exit
+            printl "  ${CROSS} By the look of it, $CPUARCH is not one of the supported CPU Architectures - aborting${BIWhite}\r\n"; exit
         else
-            printl "${BIRed}By the look of it, $CPUARCH is not one of the supported CPU Architectures - aborting${BIWhite}\r\n"; exit
+            printl "  ${CROSS} By the look of it, $CPUARCH is not one of the supported CPU Architectures - aborting${BIWhite}\r\n"; exit
     fi
 
     ## Set permissions
@@ -217,36 +178,32 @@ doPulseAgentDownload() {
 ## Auto - Install
 doPulseAgentInstall() {
     ## Installing the agent
-    printl "  - Pulse Agent: Install the Agent."
-    printl ""
-    printl ""
+    printl "  ${INFO} - Pulse Agent: Install the Agent.\n\n"
     $PLSAGTDLFLD/iotc-agent/install.sh 2>&1 | tee -a $LOGFILE
     if [ $? -eq 0 ]; then
-        printl "    - Pulse Agent: Installed in /opt/vmware/iotc-agent"
+        printl "  ${TICK} - Pulse Agent: Installed in /opt/vmware/iotc-agent"
     else 
-        printl "    - Pulse Agent: Installation NOT succesful."
+        printl "  ${CROSS} - Pulse Agent: Installation NOT succesful."
     fi
 }
 
 ## Auto - If installed, uninstall
 doPulseAgentUninstall() {
     ## Uninstall the Pulse Agent
-    printl "  - Pulse Agent: Uninstall the agent."
-    printl ""
-    printl ""
+    printl "  ${ESCL} - Pulse Agent: Uninstall the agent.\n\n"
     /opt/vmware/iotc-agent/uninstall.sh 2>&1 | tee -a $LOGFILE
     if [ $? -eq 0 ]; then
-        printl "    - Pulse Agent: Successfully uninstalled the agent."
+        printl "  ${TICK} - Pulse Agent: Successfully uninstalled the agent."
         UNINSTALL_AGENT_SUCCES=true
     else
-        printl "   - Pulse Agent: Agent NOT uninstalled succesfully"
+        printl "  ${CROSS} - Pulse Agent: Agent NOT uninstalled succesfully"
         UNINSTALL_AGENT_SUCCES=false
     fi
 }
 
 ## Module Logic
 modulePulseAgent() {
-    printstatus "Installation of the Pulse Agent..."
+    printl "  ${INFO} Installation of the Pulse Agent..."
 
     ## Module variables
     PLSAGTINSTALLED="false"
@@ -256,6 +213,11 @@ modulePulseAgent() {
     ## Module requirements
     if [ ! -d "$PLSAGTDLFLD" ]; then
         mkdir -p $PLSAGTDLFLD
+        if [ $? -eq 0 ]; then
+            printl "  ${TICK} - Pulse Agent download folder created succesful." 
+        else
+            printl "  ${CROSS} - Pulse Agent download folder creation NOT succesful."
+        fi
     fi
 
     getPulseInstanceDetails
@@ -290,8 +252,7 @@ modulePulseAgent() {
     PLSAGTREINSTALL=""
     PLSAGTINSTALLED=""
 
-    printl "  - Pulse Agent: Nothing more to do. Exiting this part."
-    printl ""
+    printl "  ${TICK} Pulse Agent Installation: Nothing more to do. Exiting this part.\n"
 
 }
 
@@ -300,6 +261,6 @@ modulePulseAgent
 
 shutdown -r now
 
-#########################
-# Onboadring comes next #
-#########################
+###############################
+# Onboadring comes separately #
+###############################
