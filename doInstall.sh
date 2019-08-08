@@ -67,9 +67,9 @@ getPulseInstanceDetails() {
     # PULSEINSTANCE="iotc005"
     # PULSEINSTANCE=$(whiptail --inputbox "\nEnter your Pulse Console Instance\n(for example iotc001,iotc002, etc.):\n" --title "Installation Pulse Agent" 10 60 $PULSEINSTANCE 3>&1 1>&2 2>&3)
     PULSEADDENDUM=".vmware.com"
-    printl "  ${INFO} - Pulse instance: $PULSEINSTANCE"
+    printl "  ${INFO}   - Pulse instance: $PULSEINSTANCE"
     PULSEHOST="$PULSEINSTANCE$PULSEADDENDUM"
-    printl "  ${INFO} - Pulse host: $PULSEHOST"
+    printl "  ${INFO}   - Pulse host: $PULSEHOST"
     PULSEPORT=443
     TIMEOUT=1
 }
@@ -84,7 +84,7 @@ testPulseInstanceConnectivity(){
     fi
 
     if nc -w $TIMEOUT -z $PULSEHOST $PULSEPORT; then
-        printl "  ${TICK} Connection to the Pulse Server ${PULSEHOST} was Successful"
+        printl "  ${TICK} - Connection to the Pulse Server ${PULSEHOST} was Successful"
     else
         printl "  ${CROSS} CONNECTION FAILED!"
         printl "  ${ESCL} - Connection to the Pulse Server ${PULSEHOST} Failed"
@@ -136,15 +136,15 @@ getPulseAgentLatestVersionInfo() {
 
 subDownloadPulseAgent() {
     ## Downloading the agent.
-    printl "  ${INFO}  Pulse Agent: Downloading the Pulse Agent.\N"
+    printl "  ${INFO} Pulse Agent: Downloading the Pulse Agent.\N"
     curl -o $PLSAGTDLFLD/$1 $2 2>&1 | tee -a $LOGFILE
     if [ $? -eq 0 ]; then
         printl "  ${TICK} - Pulse Agent: Download successful."
         ## Unpacking the agent.
         printl "  ${INFO} - Unpack $PLSAGTDLFLD/$1"
         tar -xzf $PLSAGTDLFLD/$1 -C $PLSAGTDLFLD/
-        printl "  ${INFO} - Pulse Agent for $3 is unpacked."  
-    else 
+        printl "  ${INFO} - Pulse Agent for $3 is unpacked."
+    else
         printl "  ${CROSS} - Pulse Agent: Download NOT successful."
     fi
 }
@@ -166,9 +166,9 @@ doPulseAgentDownload() {
         elif [[ $CPUARCH == *"ARMv8"* ]];then
             subDownloadPulseAgent "$PULSEAGENTARM64" "$PULSEURLARM64" "$CPUARCH" 
         elif [[ $CPUARCH == *"i686"* ]];then
-            printl "  ${CROSS} By the look of it, $CPUARCH is not one of the supported CPU Architectures - aborting${BIWhite}\r\n"; exit
+            printl "  ${CROSS} - By the look of it, $CPUARCH is not one of the supported CPU Architectures - aborting${BIWhite}\r\n"; exit
         else
-            printl "  ${CROSS} By the look of it, $CPUARCH is not one of the supported CPU Architectures - aborting${BIWhite}\r\n"; exit
+            printl "  ${CROSS} - By the look of it, $CPUARCH is not one of the supported CPU Architectures - aborting${BIWhite}\r\n"; exit
     fi
 
     ## Set permissions
@@ -179,7 +179,7 @@ doPulseAgentDownload() {
 ## Auto - Install
 doPulseAgentInstall() {
     ## Installing the agent
-    printl "  ${INFO} - Pulse Agent: Install the Agent.\n\n"
+    printl "  ${INFO} Pulse Agent: Install the Agent.\n\n"
     $PLSAGTDLFLD/iotc-agent/install.sh 2>&1 | tee -a $LOGFILE
     if [ $? -eq 0 ]; then
         printl "  ${TICK} - Pulse Agent: Installed in /opt/vmware/iotc-agent"
@@ -191,7 +191,7 @@ doPulseAgentInstall() {
 ## Auto - If installed, uninstall
 doPulseAgentUninstall() {
     ## Uninstall the Pulse Agent
-    printl "  ${ESCL} - Pulse Agent: Uninstall the agent.\n\n"
+    printl "  ${ESCL} Pulse Agent: Uninstall the agent.\n\n"
     /opt/vmware/iotc-agent/uninstall.sh 2>&1 | tee -a $LOGFILE
     if [ $? -eq 0 ]; then
         printl "  ${TICK} - Pulse Agent: Successfully uninstalled the agent."
@@ -204,7 +204,7 @@ doPulseAgentUninstall() {
 
 ## Module Logic
 modulePulseAgent() {
-    printl "  ${INFO} Installation of the Pulse Agent..."
+    printl "  ${INFO} Start installation of the Pulse Agent..."
 
     ## Module variables
     PLSAGTINSTALLED="false"
@@ -255,7 +255,6 @@ modulePulseAgent() {
 
     printl "  ${TICK} Pulse Agent Installation: Nothing more to do. Exiting this part.\n"
     printl "  ${INFO} Installation log file can be found in /var/log/VMwarePulseAgentInstall-date_time ..."
-
 
 }
 
