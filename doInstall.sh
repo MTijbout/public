@@ -47,14 +47,14 @@ pulseAgentAlreadyInstalled() {
 }
 
 pulseAgentResinstall() {
-    printl "  - Pulse Agent: Check to reinstall the Pulse Agent."
+    printl "  ${INFO} - Pulse Agent: Check to reinstall the Pulse Agent."
     if (whiptail --title "Pulse Agent Installed" --yesno "Pulse agent is already installed. Reinstall?\nOK?" 8 78); then
         ## Reinstall the agent.
-        printl "    - Pulse Agent: Selection to reinstall the agent."
+        printl "  ${INFO} - Pulse Agent: Selection to reinstall the agent."
         PLSAGTREINSTALL="true"
     else
         ## User does not want to reinstall the agent when it is already installed.
-        printl "    - Pulse Agent: Selection NOT to reinstall the agent."
+        printl "  ${ESCL} - Pulse Agent: Selection NOT to reinstall the agent."
         PLSAGTREINSTALL="false"
         return
     fi
@@ -62,14 +62,14 @@ pulseAgentResinstall() {
 
 ## Auto - Instance Hardcoded
 getPulseInstanceDetails() {
-    printl "  - Pulse Agent: Collect required environment details."
+    printl "  ${INFO} - Pulse Agent: Collect required environment details."
     ## Collect details of the targeted Pulse environment.
     # PULSEINSTANCE="iotc005"
     # PULSEINSTANCE=$(whiptail --inputbox "\nEnter your Pulse Console Instance\n(for example iotc001,iotc002, etc.):\n" --title "Installation Pulse Agent" 10 60 $PULSEINSTANCE 3>&1 1>&2 2>&3)
     PULSEADDENDUM=".vmware.com"
-    printl "    - Pulse instance: $PULSEINSTANCE"
+    printl "  ${INFO} - Pulse instance: $PULSEINSTANCE"
     PULSEHOST="$PULSEINSTANCE$PULSEADDENDUM"
-    printl "    - Pulse host: $PULSEHOST"
+    printl "  ${INFO} - Pulse host: $PULSEHOST"
     PULSEPORT=443
     TIMEOUT=1
 }
@@ -254,7 +254,7 @@ modulePulseAgent() {
     PLSAGTINSTALLED=""
 
     printl "  ${TICK} Pulse Agent Installation: Nothing more to do. Exiting this part.\n"
-    printl "\n  ${INFO} Installation log file can be found in /var/log/VMwarePulseAgentInstall-date_time ... \n"
+    printl "  ${INFO} Installation log file can be found in /var/log/VMwarePulseAgentInstall-date_time ..."
 
 
 }
