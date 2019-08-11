@@ -257,7 +257,7 @@ modulePulseAgent() {
 
 }
 
-PULSEINSTANCE="iotc008"
+PULSEINSTANCE="iotc005"
 modulePulseAgent
 
 shutdown -r now
